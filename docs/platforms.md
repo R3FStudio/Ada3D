@@ -30,7 +30,7 @@ After extracting a Linux release, run `sh install.sh` to install Ada3D and its l
 
 ## GitHub releases
 
-Push a tag containing `v` followed by the package version in `Cargo.toml`, to run **Package Ada3D**. It builds Windows x86-64, Linux x86-64/ARM64, and macOS Intel/Apple Silicon packages, then attaches the installers, portable ZIPs and their SHA-256 checksums to the release. Manual workflow runs produce downloadable Actions artifacts without publishing a release.
+Push a tag containing `v` followed by the package version in `Cargo.toml`, to run **Package Ada3D**. It builds Windows x86-64, Linux x86-64/ARM64, and macOS Intel/Apple Silicon packages, then attaches the installers, portable ZIPs and their SHA-256 checksums to the release. Pushes to main and manual workflow runs produce downloadable Actions artifacts without publishing a release.
 
 Updates use [R3FStudio/Ada3D](https://github.com/R3FStudio/Ada3D) by default. Release workflows set `ADA3D_UPDATE_REPOSITORY` from `github.repository`; forks can override it when building.
 
