@@ -22,7 +22,7 @@ Save editable work as **.ada3dproject**. Recent projects appear in Welcome.
 |---|---|
 | ![2D shape palette](docs/images/shapes.png) | ![Settings](docs/images/settings.png) |
 
-[3D shapes and painting](docs/3d-editing.md) · [User guide](docs/user-guide.md) · [Exporting](docs/exporting.md) · [Building and packaging](docs/platforms.md)
+[3D shapes and painting](docs/3d-editing.md) · [User guide](docs/user-guide.md) · [Exporting](docs/exporting.md) · [Build from source](docs/platforms.md) · [Create installers](docs/packaging.md)
 
 ## Contribute
 

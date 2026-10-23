@@ -45,8 +45,6 @@ The cleaner removes `build/` and old `target/` output. Add `--dist` to remove re
 
 ## Native installers
 
-Run `python tools/installers.py <release-zip>` on the platform that produced the ZIP. Windows builds a single setup EXE with shortcuts, project associations and an uninstaller. macOS builds a PKG for Applications. Linux builds DEB and RPM packages with desktop launchers and software-center metadata; install them with your desktop package installer, `apt install ./<file>.deb`, or `dnf install ./<file>.rpm`. These are direct downloads, not app-store listings.
-
-Linux packaging requires `dpkg-dev` and `rpm`. macOS signing can use `MACOS_APP_SIGN_IDENTITY` and `MACOS_INSTALLER_SIGN_IDENTITY` after importing your signing certificates. Unsigned packages are not notarized.
+See [Create Ada3D packages](packaging.md) for Windows setup, macOS PKG, Linux DEB/RPM, signing options and GitHub Actions instructions.
 
 The updater selects the matching installer for a package-managed installation and the ZIP for a portable copy. Packages are verified before installation. System-wide Linux and macOS updates request the operating system's administrator approval. Update checks run at startup or from About in Settings.
