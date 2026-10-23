@@ -13,7 +13,23 @@ impl Studio {
             .show(ctx, |ui| {
                 let (area, response) =
                     ui.allocate_exact_size(ui.available_size(), Sense::click_and_drag());
-                let menu = response.context_menu(|ui| {
+                let mut popup = egui::Popup::context_menu(&response);
+                if popup.is_open()
+                    && ctx.input(|i| i.pointer.secondary_clicked())
+                    && let Some(point) = ctx.pointer_hover_pos().filter(|p| area.contains(*p))
+                    && popup
+                        .get_popup_rect()
+                        .is_some_and(|rect| !rect.contains(point))
+                {
+                    // The modal backdrop owns this click, so retarget the menu directly.
+                    ctx.data_mut(|data| {
+                        data.remove::<f64>(response.id.with("menu-opened"));
+                    });
+                    popup = popup
+                        .open_memory(Some(egui::SetOpenCommand::Bool(true)))
+                        .close_behavior(egui::PopupCloseBehavior::IgnoreClicks);
+                }
+                let menu = popup.show(|ui| {
                     self.block_behind_menu(ui);
                     ui.spacing_mut().interact_size.y = 28.0;
                     let now = ctx.input(|i| i.time);

@@ -211,3 +211,48 @@ fn context_menu_blocks_scene_navigation_and_escape_only_closes_menu() {
     assert!(!egui::Popup::is_any_open(&editor.ctx));
     assert_eq!(editor.app.selected, Some(99));
 }
+
+#[test]
+fn right_click_reopens_context_menu_at_the_new_workspace_position() {
+    for scene in [false, true] {
+        let mut editor = Editor::new();
+        editor.app.scene_view = scene;
+        editor.open();
+        let before = editor.app.doc.clone();
+        let camera = (editor.app.camera.yaw, editor.app.camera.pitch);
+        let zoom = editor.app.zoom;
+        for point in [Pos2::new(80.0, 400.0), Pos2::new(450.0, 80.0)] {
+            editor.pointer(point, egui::PointerButton::Secondary, true);
+            editor.pointer(point, egui::PointerButton::Secondary, false);
+            editor.frame(vec![]);
+            assert!(egui::Popup::is_any_open(&editor.ctx));
+            // Find the actual popup, rather than assuming its width or height.
+            let popup_id = editor.ctx.memory(|memory| {
+                memory
+                    .areas()
+                    .visible_layer_ids()
+                    .into_iter()
+                    .find(|layer| layer.order == egui::Order::Foreground)
+                    .expect("open context menu")
+                    .id
+            });
+            assert_eq!(
+                egui::Popup::position_of_id(&editor.ctx, popup_id),
+                Some(point)
+            );
+            assert_eq!(editor.app.doc, before);
+            assert_eq!((editor.app.camera.yaw, editor.app.camera.pitch), camera);
+            assert_eq!(editor.app.zoom, zoom);
+            assert!(!editor.app.history.can_undo());
+        }
+        let command = Pos2::new(500.0, 230.0);
+        editor.pointer(command, egui::PointerButton::Primary, true);
+        editor.pointer(command, egui::PointerButton::Primary, false);
+        assert!(
+            editor.app.tool == Tool::Dropper,
+            "relocated menu commands work"
+        );
+        assert!(!egui::Popup::is_any_open(&editor.ctx));
+        assert_eq!(editor.app.doc, before);
+    }
+}
