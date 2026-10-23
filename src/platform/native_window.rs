@@ -55,11 +55,11 @@ mod windows {
     ) -> Result<(), String> {
         let handle = hwnd(window)?;
         attribute(handle, DWMWA_USE_IMMERSIVE_DARK_MODE, i32::from(dark))?;
-        // Preserve the established Mica caption treatment. Acrylic uses the
-        // system material; DWM continues to draw every native caption button.
+        // Preserve Mica. Acrylic suppresses the separate caption-color layer so
+        // its backdrop also shows behind DWM-rendered native buttons.
         let [r, g, b] = caption_surface(dark);
         let caption_color = if enabled && backdrop == Backdrop::Acrylic {
-            -1
+            DWMWA_COLOR_NONE as i32
         } else {
             i32::from(r) | (i32::from(g) << 8) | (i32::from(b) << 16)
         };
@@ -659,13 +659,19 @@ pub use windows::{
     splash_frame,
 };
 
-/// Paint the app header without covering the native caption controls.
+/// Keep Acrylic's title bar clear for DWM's backdrop and native button layer.
 pub fn paint_header_background(
     ctx: &eframe::egui::Context,
     frame: &eframe::Frame,
     painter: &eframe::egui::Painter,
     color: eframe::egui::Color32,
+    acrylic: bool,
 ) {
+    if cfg!(target_os = "windows") && acrylic {
+        // A client tint over this strip also tints DWM's native glyphs. Let
+        // Windows composite the material and buttons without app overdraw.
+        return;
+    }
     let rect = header_content_rect(ctx, frame);
     painter.with_clip_rect(rect).rect_filled(rect, 0.0, color);
 }

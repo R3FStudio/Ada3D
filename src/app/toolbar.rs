@@ -23,7 +23,13 @@ impl Studio {
                     ui.clip_rect()
                         .intersect(native_window::header_content_rect(ctx, frame)),
                 );
-                native_window::paint_header_background(ctx, frame, ui.painter(), colors.panel);
+                native_window::paint_header_background(
+                    ctx,
+                    frame,
+                    ui.painter(),
+                    colors.panel,
+                    self.backdrop_active && self.preferences.backdrop == Backdrop::Acrylic,
+                );
                 if self.loading.is_some()
                     || self.pending.is_some()
                     || self.error.is_some()
