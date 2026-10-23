@@ -3,6 +3,7 @@ use super::*;
 mod menu;
 mod scene_paint;
 mod selection;
+mod shapes;
 
 #[test]
 fn background_project_load_applies_valid_results_and_preserves_artwork_on_failure() {
@@ -165,7 +166,7 @@ fn stationary_brush_does_not_accumulate_opacity_from_repaints() {
 fn shape_preview_commits_one_edit_and_undo_restores_saved_state() {
     let mut s = studio(32, 32);
     let before = s.doc.clone();
-    s.set_tool(Tool::Rectangle);
+    s.set_tool(Tool::Shape(ShapeKind::Rectangle));
     s.filled = true;
     s.start_gesture([2.0, 2.0]);
     s.draw_gesture([10.0, 10.0]);

@@ -11,6 +11,7 @@ fn main() -> eframe::Result {
     let mut capture_delay = None;
     let mut ui_scale = None;
     let mut demo = false;
+    let mut project_path = None;
     let mut blank = false;
     let mut settings_page = false;
     let mut welcome = false;
@@ -32,10 +33,12 @@ fn main() -> eframe::Result {
     let mut recent_preview = false;
     let mut pixel_preview = false;
     let mut scene_preview = None;
+    let mut shapes_preview = false;
     let mut guide_topic = None;
     while let Some(arg) = args.next() {
         match arg.as_str() {
             "--demo" => demo = true,
+            "--shapes-library" => shapes_preview = true,
             "--scene-library" => scene_preview = Some(false),
             "--scene-paint" => scene_preview = Some(true),
             "--guide-topic" => guide_topic = args.next().and_then(|s| s.parse::<usize>().ok()),
@@ -83,6 +86,9 @@ fn main() -> eframe::Result {
                     _ => None,
                 })
             }
+            value if !value.starts_with('-') && value.ends_with(".ada3dproject") => {
+                project_path = Some(std::path::PathBuf::from(value))
+            }
             _ => {}
         }
     }
@@ -126,6 +132,9 @@ fn main() -> eframe::Result {
             }
             let mut studio = app::Studio::new(cc, preference_path);
             studio.configure_startup(startup);
+            if let Some(path) = project_path {
+                studio.open_initial_project(path, &cc.egui_ctx);
+            }
             if demo || capture.is_some() && !settings_page && !welcome && !startup_check {
                 studio.load_study();
             }
@@ -192,6 +201,9 @@ fn main() -> eframe::Result {
             }
             if settings_page {
                 studio.open_settings_capture();
+            }
+            if shapes_preview {
+                studio.open_shapes_capture();
             }
             if let Some(paint) = scene_preview {
                 studio.open_scene_capture(paint);

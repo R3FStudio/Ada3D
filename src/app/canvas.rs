@@ -346,6 +346,16 @@ impl Studio {
                     );
                     self.place_scene_object(*kind, position);
                 }
+                if !blocked
+                    && !self.scene_view
+                    && inside
+                    && let Some(kind) = response.dnd_release_payload::<ShapeKind>()
+                    && let Some(point) = pointer
+                {
+                    let center =
+                        canvas_point(point, rect, self.doc.canvas.width, self.doc.canvas.height);
+                    self.place_canvas_shape(*kind, center);
+                }
                 if self.tool == Tool::Select {
                     let selection_pointer = pointer.filter(|_| {
                         !blocked
@@ -436,15 +446,10 @@ impl Studio {
                     .line(g.last, point, self.radius, self.color, self.opacity)
             }
             Tool::Eraser => self.doc.canvas.erase_line(g.last, point, self.radius),
-            Tool::Line | Tool::Rectangle | Tool::Ellipse => {
+            Tool::Shape(kind) => {
                 if let Some(base) = &g.base {
                     self.doc.canvas = base.clone();
                 }
-                let kind = match g.tool {
-                    Tool::Line => ShapeKind::Line,
-                    Tool::Rectangle => ShapeKind::Rectangle,
-                    _ => ShapeKind::Ellipse,
-                };
                 self.doc.canvas.draw_shape(
                     kind,
                     g.start,

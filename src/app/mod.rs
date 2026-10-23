@@ -11,6 +11,7 @@ mod projects;
 mod render;
 mod scene_tools;
 mod selection;
+mod shape_tools;
 mod startup;
 mod toolbar;
 mod updates;
@@ -45,9 +46,7 @@ enum Tool {
     Eraser,
     Fill,
     Dropper,
-    Line,
-    Rectangle,
-    Ellipse,
+    Shape(ShapeKind),
     Select,
 }
 #[derive(Clone)]

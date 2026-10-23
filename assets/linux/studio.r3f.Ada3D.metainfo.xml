@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<component type="desktop-application">
+  <id>studio.r3f.Ada3D</id><name>Ada3D</name>
+  <summary>Draw in 2D and create in 3D</summary>
+  <metadata_license>CC0-1.0</metadata_license><project_license>GPL-3.0-only</project_license>
+  <developer id="studio.r3f"><name>R3F Studio</name></developer>
+  <description><p>Draw with brushes and shapes, transform selections, paint 3D objects and export your artwork.</p></description>
+  <launchable type="desktop-id">Ada3D.desktop</launchable>
+  <url type="homepage">https://github.com/R3FStudio/Ada3D</url>
+  <url type="bugtracker">https://github.com/R3FStudio/Ada3D/issues</url>
+  <screenshots><screenshot type="default"><caption>Drawing workspace</caption><image>https://raw.githubusercontent.com/R3FStudio/Ada3D/main/docs/images/workspace.png</image></screenshot></screenshots>
+  <content_rating type="oars-1.1"/>
+</component>

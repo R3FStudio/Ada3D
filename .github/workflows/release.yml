@@ -3,6 +3,9 @@ on:
   push:
     tags: ['v*']
   workflow_dispatch:
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
 permissions:
   contents: read
 jobs:
@@ -36,7 +39,21 @@ jobs:
           python-version: '3.12'
       - name: Linux dependencies
         if: runner.os == 'Linux'
-        run: sudo apt-get update && sudo apt-get install -y build-essential pkg-config libx11-dev libxi-dev libxcursor-dev libxrandr-dev libxkbcommon-dev libwayland-dev libgl1-mesa-dev
+        run: sudo apt-get update && sudo apt-get install -y build-essential pkg-config libx11-dev libxi-dev libxcursor-dev libxrandr-dev libxkbcommon-dev libwayland-dev libgl1-mesa-dev dpkg-dev rpm
+      - name: Windows installer compiler
+        if: runner.os == 'Windows'
+        shell: pwsh
+        run: |
+          $installer = Join-Path $env:RUNNER_TEMP 'innosetup.exe'
+          Invoke-WebRequest 'https://github.com/jrsoftware/issrc/releases/download/is-6_7_3/innosetup-6.7.3.exe' -OutFile $installer
+          $signature = Get-AuthenticodeSignature $installer
+          if ($signature.Status -ne 'Valid' -or $signature.SignerCertificate.Subject -notmatch 'Pyrsys') { throw 'Invalid installer compiler signature' }
+          $directory = Join-Path $env:RUNNER_TEMP 'InnoSetup'
+          $process = Start-Process $installer -ArgumentList @('/VERYSILENT','/SUPPRESSMSGBOXES','/NORESTART','/CURRENTUSER',('/DIR="' + $directory + '"')) -WindowStyle Hidden -Wait -PassThru
+          if ($process.ExitCode -ne 0) { throw 'Installer compiler setup failed' }
+          "ISCC=$directory/ISCC.exe" >> $env:GITHUB_ENV
+      - name: Installer artwork dependency
+        run: python -m pip install Pillow==13.0.0
       - name: Validate release version
         shell: python
         run: |
@@ -51,6 +68,12 @@ jobs:
       - run: cargo build --release --locked
       - run: python tools/collect-licenses.py
       - run: python tools/package.py
+      - name: Build native installers
+        shell: python
+        run: |
+          import subprocess, sys, tomllib
+          version = tomllib.load(open('Cargo.toml', 'rb'))['package']['version']
+          subprocess.run([sys.executable, 'tools/installers.py', f'dist/Ada3D-v{version}-${{ matrix.platform }}.zip'], check=True)
       - name: Upload release files only
         uses: actions/upload-artifact@v7
         with:
@@ -58,6 +81,14 @@ jobs:
           path: |
             dist/Ada3D-v*-${{ matrix.platform }}.zip
             dist/Ada3D-v*-${{ matrix.platform }}.zip.sha256
+            dist/Ada3D-v*-${{ matrix.platform }}-setup.exe
+            dist/Ada3D-v*-${{ matrix.platform }}-setup.exe.sha256
+            dist/Ada3D-v*-${{ matrix.platform }}.pkg
+            dist/Ada3D-v*-${{ matrix.platform }}.pkg.sha256
+            dist/Ada3D-v*-${{ matrix.platform }}.deb
+            dist/Ada3D-v*-${{ matrix.platform }}.deb.sha256
+            dist/Ada3D-v*-${{ matrix.platform }}.rpm
+            dist/Ada3D-v*-${{ matrix.platform }}.rpm.sha256
           if-no-files-found: error
           compression-level: 0
           include-hidden-files: false
@@ -78,5 +109,13 @@ jobs:
           files: |
             release/Ada3D-v*.zip
             release/Ada3D-v*.zip.sha256
+            release/Ada3D-v*-setup.exe
+            release/Ada3D-v*-setup.exe.sha256
+            release/Ada3D-v*.pkg
+            release/Ada3D-v*.pkg.sha256
+            release/Ada3D-v*.deb
+            release/Ada3D-v*.deb.sha256
+            release/Ada3D-v*.rpm
+            release/Ada3D-v*.rpm.sha256
           fail_on_unmatched_files: true
           generate_release_notes: true

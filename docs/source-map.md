@@ -19,6 +19,8 @@ Use this map to find the code for a feature. Document algorithms are separate fr
 |---|---|
 | app/mod.rs | State, construction and frame orchestration |
 | app/canvas.rs | Canvas input and painting gestures |
+| app/shape_tools.rs | 2D thumbnails and drag placement |
+| core/raster/shapes.rs | Polygon outlines and signed edge distance |
 | app/scene_tools.rs | 3D shape palette, drag placement and surface painting |
 | core/scene/paint.rs | Object-space paint coordinates and surface storage |
 | core/scene/shapes.rs | Additional primitive meshes |
@@ -43,6 +45,9 @@ Use this map to find the code for a feature. Document algorithms are separate fr
 | updater/network.rs | GitHub metadata and download progress |
 | updater/archive.rs | Package validation and extraction |
 | updater/install.rs | Platform restart helpers |
+| updater/packages.rs | Installed package detection and native installer selection |
+| tools/installers.py | Native package builders and wizard artwork |
+| tools/windows-setup.iss | Windows setup wizard |
 | ui/startup.rs | Logo splash, progress presentation and startup fades |
 | app/preferences.rs | Preference changes and persistence |
 | app/render.rs | Preview-worker requests and texture updates |

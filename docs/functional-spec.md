@@ -48,3 +48,7 @@ The 3D sidebar opens Shapes by default, with eight thumbnail buttons. Click adds
 Paint uses the visible mesh’s perspective-correct surface coordinates. Brush, Pencil, Marker, Eraser, Bucket, transparency and surface sampling operate on per-object paint. Orbiting does not alter paint coordinates. A brush gesture commits one history transaction and does not change canvas pixels. Bucket affects the clicked object’s entire surface.
 
 Surface maps are 256 × 256 pixels with an 8 MiB project paint budget. Their memory counts toward history limits. Projects without paint maps retain their original colors. Project saves and scene image exports retain paint; OBJ exports geometry only.
+
+### 2D shape palette
+
+The 2D Shapes tab offers twelve labeled thumbnails in three columns. Clicking selects the drawing tool without changing artwork; dragging a thumbnail onto the canvas places one shape at the drop position. Canvas drags preview a shape from the original pixels and commit one undo step. Shapes support filled or outlined rendering, color, alpha and stroke width. The Brushes tab retains its painting tools.

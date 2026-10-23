@@ -21,7 +21,8 @@ pub struct Guide {
 }
 impl Guide {
     pub fn set_topic(&self, topic: usize) {
-        self.state.lock().unwrap_or_else(|e| e.into_inner()).topic = topic.min(7);
+        self.state.lock().unwrap_or_else(|e| e.into_inner()).topic =
+            topic.min(topics::NAMES.len() - 1);
     }
     pub fn enable_capture(&self, path: std::path::PathBuf) {
         let mut state = self.state.lock().unwrap_or_else(|e| e.into_inner());
@@ -110,14 +111,14 @@ pub fn draw(ctx: &egui::Context, state: &mut GuideState) {
     egui::CentralPanel::default().frame(egui::Frame::new().fill(colors.panel).inner_margin(20)).show(ctx, |ui| {
         ui.style_mut().text_styles.insert(egui::TextStyle::Body, egui::FontId::proportional(14.0));
         egui::ScrollArea::vertical().show(ui, |ui| {
-            if state.topic == 7 {
+            if state.topic == topics::TOPICS.len() {
                 ui.heading("Keyboard and mouse shortcuts"); ui.add_space(16.0);
                 egui::Grid::new("help-shortcuts").striped(true).min_col_width(150.0).show(ui, |ui| {
                     for (keys, action) in [("B / E / F / I", "Brush / Eraser / Bucket / Picker"), ("V / Delete", "3D selection / Delete object"), ("Ctrl+N / O / S", "New / Open / Save"), ("Ctrl+Shift+S", "Save as"), ("Ctrl+Z / Ctrl+Shift+Z", "Undo / Redo"), ("Scroll / middle-drag", "Zoom / Pan"), ("Right-drag", "Orbit in 3D"), ("Escape", "Dismiss a menu or clear selection")] { ui.strong(keys); ui.label(action); ui.end_row(); }
                 });
                 ui.add_space(16.0); ui.label("On macOS, use Command for document shortcuts. Text fields keep normal editing shortcuts."); return;
             }
-            let topic = &topics::TOPICS[state.topic.min(6)];
+            let topic = &topics::TOPICS[state.topic.min(topics::TOPICS.len() - 1)];
             ui.heading(topic.title); ui.add_space(14.0);
             let texture = gallery::photo(ctx, topic.image);
             let width = ui.available_width().min(720.0);

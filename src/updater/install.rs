@@ -15,6 +15,9 @@ fn ps_quote(value: &Path) -> String {
 pub(super) fn launch(stage: &Path) -> Result<(), String> {
     let stage = stage.canonicalize().map_err(|e| e.to_string())?;
     let executable = std::env::current_exe().map_err(|e| e.to_string())?;
+    if let Some((kind, package)) = super::packages::staged(&stage) {
+        return launch_native(&stage, &executable, kind, &package);
+    }
     let target = install_target(&executable)?;
     let parent = target.parent().ok_or("No installation directory")?;
     let probe = parent.join(format!(".Ada3D-write-test-{}", std::process::id()));
@@ -72,6 +75,87 @@ pub(super) fn launch(stage: &Path) -> Result<(), String> {
             .map_err(|e| e.to_string())?;
     }
     Ok(())
+}
+fn launch_native(
+    stage: &Path,
+    executable: &Path,
+    kind: super::packages::Kind,
+    package: &Path,
+) -> Result<(), String> {
+    #[cfg(target_os = "windows")]
+    {
+        use std::os::windows::process::CommandExt;
+        if kind != super::packages::Kind::Setup {
+            return Err("Incorrect installer for Windows.".into());
+        }
+        let parent = executable.parent().ok_or("Missing installation folder")?;
+        let script = stage.join("native-install.ps1");
+        fs::write(
+            &script,
+            windows_package_script(executable, parent, package, std::process::id()),
+        )
+        .map_err(|e| e.to_string())?;
+        Command::new("powershell.exe")
+            .args([
+                "-NoProfile",
+                "-NonInteractive",
+                "-WindowStyle",
+                "Hidden",
+                "-File",
+            ])
+            .arg(script)
+            .creation_flags(0x08000000)
+            .spawn()
+            .map_err(|e| e.to_string())?;
+    }
+    #[cfg(not(target_os = "windows"))]
+    {
+        let command = match kind {
+            super::packages::Kind::Deb if cfg!(target_os = "linux") => {
+                format!("pkexec /usr/bin/dpkg -i {}", quote(package))
+            }
+            super::packages::Kind::Rpm if cfg!(target_os = "linux") => {
+                format!("pkexec /usr/bin/rpm -U {}", quote(package))
+            }
+            super::packages::Kind::Pkg if cfg!(target_os = "macos") => format!(
+                "/usr/bin/osascript -e 'on run argv' -e 'do shell script \"/usr/sbin/installer -pkg \" & quoted form of (item 1 of argv) & \" -target /\" with administrator privileges' -e 'end run' {}",
+                quote(package)
+            ),
+            _ => return Err("Incorrect installer for this platform.".into()),
+        };
+        let restart = if cfg!(target_os = "macos") {
+            format!("/usr/bin/open -n {}", quote(&install_target(executable)?))
+        } else {
+            format!("{} >/dev/null 2>&1 &", quote(executable))
+        };
+        let script = stage.join("native-install.sh");
+        fs::write(&script,format!("#!/bin/sh\nset -eu\nattempt=0\nwhile kill -0 {} 2>/dev/null; do\n attempt=$((attempt+1))\n [ \"$attempt\" -lt 600 ] || exit 1\n sleep 0.2\ndone\n{}\n{}\n",std::process::id(),command,restart)).map_err(|e|e.to_string())?;
+        Command::new("/bin/sh")
+            .arg(script)
+            .spawn()
+            .map_err(|e| e.to_string())?;
+    }
+    Ok(())
+}
+#[cfg(target_os = "windows")]
+fn windows_package_script(executable: &Path, parent: &Path, package: &Path, pid: u32) -> String {
+    format!(
+        r#"$ErrorActionPreference = 'Stop'
+$limit = (Get-Date).AddMinutes(2)
+while (Get-Process -Id {pid} -ErrorAction SilentlyContinue) {{
+ if ((Get-Date) -gt $limit) {{ exit 1 }}
+ Start-Sleep -Milliseconds 200
+}}
+$installer = {package}
+$destination = {parent}
+$args = @('/VERYSILENT','/SUPPRESSMSGBOXES','/NORESTART',('/DIR="' + $destination + '"'))
+$result = Start-Process -FilePath $installer -ArgumentList $args -Wait -PassThru
+if ($result.ExitCode -eq 0) {{ Start-Process -FilePath {executable} }}
+"#,
+        package = ps_quote(package),
+        parent = ps_quote(parent),
+        executable = ps_quote(executable)
+    )
 }
 fn install_target(executable: &Path) -> Result<PathBuf, String> {
     if cfg!(target_os = "macos") {
@@ -192,6 +276,17 @@ mod tests {
             let script = windows_script(Path::new("C:/Ada3D.exe"), Path::new("C:/cache"), 1234);
             assert!(script.contains("Get-Process -Id 1234"));
             assert!(!script.contains("Stop-Process"));
+            let native = windows_package_script(
+                Path::new("C:/Ada's app/Ada3D.exe"),
+                Path::new("C:/Ada's app"),
+                Path::new("C:/cache/installer.exe"),
+                1234,
+            );
+            assert!(native.contains("Get-Process -Id 1234"));
+            assert!(native.contains("/VERYSILENT"));
+            assert!(native.contains("if ($result.ExitCode -eq 0)"));
+            assert!(native.contains("'C:/Ada''s app'"));
+            assert!(!native.contains("Stop-Process"));
         }
     }
 

@@ -25,11 +25,21 @@ impl<T: Send + 'static> Job<T> {
         viewport: egui::ViewportId,
         work: impl FnOnce(&mut Reporter<'_>) -> Result<T, String> + Send + 'static,
     ) -> Result<Self, String> {
-        ACTIVE_TASKS
-            .fetch_update(Ordering::AcqRel, Ordering::Acquire, |n| {
-                (n < 2).then_some(n + 1)
-            })
-            .map_err(|_| "Wait for the current file tasks to finish.".to_owned())?;
+        let mut active = ACTIVE_TASKS.load(Ordering::Acquire);
+        loop {
+            if active >= 2 {
+                return Err("Wait for the current file tasks to finish.".into());
+            }
+            match ACTIVE_TASKS.compare_exchange_weak(
+                active,
+                active + 1,
+                Ordering::AcqRel,
+                Ordering::Acquire,
+            ) {
+                Ok(_) => break,
+                Err(current) => active = current,
+            }
+        }
         let permit = Permit;
         let (send, receiver) = mpsc::sync_channel(1);
         let progress = Arc::new(Mutex::new(Progress::new("Starting", 0, 0, "")));

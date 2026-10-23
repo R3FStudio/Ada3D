@@ -1,7 +1,7 @@
 //! Embedded editor screenshots for the illustrated guide.
 use eframe::egui::{self, Color32, Rect, Vec2};
 pub fn photo(ctx: &egui::Context, index: usize) -> egui::TextureHandle {
-    let index = index % 7;
+    let index = index % 8;
     let key = egui::Id::new(("guide-photo", index));
     if let Some(texture) = ctx.data(|d| d.get_temp::<egui::TextureHandle>(key)) {
         return texture;
@@ -13,7 +13,8 @@ pub fn photo(ctx: &egui::Context, index: usize) -> egui::TextureHandle {
         3 => include_bytes!("../../assets/help/scene.png"),
         4 => include_bytes!("../../assets/help/export.png"),
         5 => include_bytes!("../../assets/help/settings.png"),
-        _ => include_bytes!("../../assets/help/scene-paint.png"),
+        6 => include_bytes!("../../assets/help/scene-paint.png"),
+        _ => include_bytes!("../../assets/help/shapes.png"),
     };
     let decoded = image::load_from_memory(bytes)
         .expect("validated embedded guide image")

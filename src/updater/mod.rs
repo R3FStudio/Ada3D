@@ -2,6 +2,7 @@
 mod archive;
 mod install;
 mod network;
+mod packages;
 use std::path::PathBuf;
 use std::sync::{
     Arc, Mutex,

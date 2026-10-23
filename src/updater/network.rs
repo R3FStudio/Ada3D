@@ -73,7 +73,8 @@ pub(super) fn check_and_download(
         return Ok(None);
     }
     let version = release.tag_name.trim_start_matches('v').to_owned();
-    let name = format!("Ada3D-v{version}-{}.zip", super::platform());
+    let kind = super::packages::installed();
+    let name = format!("Ada3D-v{version}-{}{}", super::platform(), kind.suffix());
     let asset = release
         .assets
         .iter()
@@ -142,7 +143,7 @@ pub(super) fn check_and_download(
             .call()
             .map_err(|e| e.to_string())?
             .into_reader();
-        let mut output = File::create(stage.join("package.zip")).map_err(|e| e.to_string())?;
+        let mut output = File::create(stage.join(kind.staged_name())).map_err(|e| e.to_string())?;
         let mut digest = Sha256::new();
         let mut buffer = [0u8; 65536];
         let mut downloaded = 0u64;
@@ -184,7 +185,17 @@ pub(super) fn check_and_download(
             "Updating - verifying package...".into(),
             Some(1.0),
         );
-        archive::unpack(&stage.join("package.zip"), &stage.join("payload"))?;
+        let package = stage.join(kind.staged_name());
+        let mut header = [0; 8];
+        File::open(&package)
+            .and_then(|mut file| file.read_exact(&mut header))
+            .map_err(|e| e.to_string())?;
+        if !kind.valid_header(&header) {
+            return Err("The update package format is invalid.".into());
+        }
+        if kind == super::packages::Kind::Portable {
+            archive::unpack(&package, &stage.join("payload"))?;
+        }
         Ok(Some((version, stage.clone())))
     })();
     if result.is_err() {

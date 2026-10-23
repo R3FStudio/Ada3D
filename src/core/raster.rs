@@ -3,6 +3,8 @@
 
 use serde::{Deserialize, Serialize};
 
+mod shapes;
+
 pub const MAX_DIMENSION: u32 = 2048;
 
 #[derive(Clone, Copy, Debug, PartialEq, Eq, Serialize, Deserialize)]
@@ -10,6 +12,15 @@ pub enum ShapeKind {
     Line,
     Rectangle,
     Ellipse,
+    RoundedRectangle,
+    Triangle,
+    Diamond,
+    Pentagon,
+    Hexagon,
+    Star,
+    Arrow,
+    Heart,
+    Cross,
 }
 
 #[derive(Clone, Debug, PartialEq, Serialize, Deserialize)]
@@ -245,6 +256,7 @@ impl Raster {
             return;
         }
         let center = [(left + right) * 0.5, (top + bottom) * 0.5];
+        let polygon = kind.polygon(left, top, right, bottom);
         let pad = if filled { 1.0 } else { radius + 1.0 };
         let [x0, y0, x1, y1] = self.clip_bounds([left - pad, top - pad, right + pad, bottom + pad]);
         for y in y0..y1 {
@@ -271,7 +283,13 @@ impl Raster {
                             (normalized - 1.0) / gradient
                         }
                     }
+                    ShapeKind::RoundedRectangle => {
+                        let corner = half[0].min(half[1]) * 0.3;
+                        let q = [delta[0] - half[0] + corner, delta[1] - half[1] + corner];
+                        q[0].max(0.0).hypot(q[1].max(0.0)) + q[0].max(q[1]).min(0.0) - corner
+                    }
                     ShapeKind::Line => unreachable!(),
+                    _ => shapes::polygon_distance([x as f64 + 0.5, y as f64 + 0.5], &polygon),
                 };
                 let coverage = if filled {
                     (0.5 - distance).clamp(0.0, 1.0)

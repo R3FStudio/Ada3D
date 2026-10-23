@@ -106,11 +106,13 @@ impl Studio {
 
     pub(super) fn inspector(&mut self, ctx: &egui::Context) {
         egui::SidePanel::right("inspector")
-            .exact_width(if self.scene_view && self.tab == Tab::Objects {
-                302.0
-            } else {
-                286.0
-            })
+            .exact_width(
+                if self.tab == Tab::Shapes || self.scene_view && self.tab == Tab::Objects {
+                    302.0
+                } else {
+                    286.0
+                },
+            )
             .frame(
                 egui::Frame::new()
                     .fill(appearance::palette(ctx).panel)
@@ -126,7 +128,7 @@ impl Studio {
                     ui.label(
                         egui::RichText::new(match self.tab {
                             Tab::Paint => "Draw on the canvas",
-                            Tab::Shapes => "Drag to draw a shape",
+                            Tab::Shapes => "Choose a shape, then draw or drag it onto the canvas",
                             Tab::Objects if self.scene_paint_tools => {
                                 "Paint directly on object surfaces"
                             }
@@ -166,15 +168,7 @@ impl Studio {
         }
     }
     fn shapes_inspector(&mut self, ui: &mut egui::Ui) {
-        for (tool, label) in [
-            (Tool::Line, "Line"),
-            (Tool::Rectangle, "Rectangle"),
-            (Tool::Ellipse, "Ellipse"),
-        ] {
-            if ui.selectable_label(self.tool == tool, label).clicked() {
-                self.set_tool(tool);
-            }
-        }
+        self.canvas_shape_palette(ui);
         ui.add_space(8.0);
         ui.checkbox(&mut self.filled, "Filled shape");
         ui.add(egui::Slider::new(&mut self.radius, 0.5..=40.0).text("Stroke radius"));

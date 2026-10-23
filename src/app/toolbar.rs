@@ -203,7 +203,7 @@ impl Studio {
                             self.tab = tab;
                             match tab {
                                 Tab::Paint => self.set_tool(Tool::Brush),
-                                Tab::Shapes => self.set_tool(Tool::Rectangle),
+                                Tab::Shapes => self.set_tool(Tool::Shape(ShapeKind::Rectangle)),
                                 Tab::Objects => {
                                     self.scene_paint_tools = false;
                                     self.set_tool(Tool::Select);

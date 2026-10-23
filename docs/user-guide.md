@@ -68,3 +68,9 @@ Use Command instead of Ctrl on macOS. Focused text fields keep their normal edit
 Open **Help** in the title bar for illustrated instructions. The guide stays open while you work.
 
 ![Ada3D Help](images/help.png)
+
+## 2D shapes
+
+Open **2D shapes** for lines, rectangles, ellipses, rounded rectangles, triangles, diamonds, pentagons, hexagons, stars, arrows, hearts and crosses. Choose a thumbnail and drag on the canvas to draw at any size, or drag a thumbnail onto the canvas to place it. Set the color, stroke radius and **Filled shape** before drawing. Use Select to transform its pixels afterward.
+
+![2D shape palette](images/shapes.png)

@@ -8,19 +8,19 @@
 
 Download the package for Windows, macOS or Linux from [**Releases**](https://github.com/R3FStudio/Ada3D/releases).
 
-- **Windows:** extract the ZIP and run **Ada3D.exe**.
-- **macOS:** extract the ZIP and move **Ada3D.app** to Applications.
-- **Linux:** extract the ZIP and run **Ada3D**. See [system requirements](docs/platforms.md).
+- **Windows:** run the setup wizard, or extract the portable ZIP.
+- **macOS:** open the PKG installer, or move **Ada3D.app** from the ZIP to Applications.
+- **Linux:** open the DEB or RPM with your package installer. A portable ZIP is also available. See [system requirements](docs/platforms.md).
 
 ## Create
 
-Use brushes, shapes and a canvas color sampler. Select pixels to move, resize or rotate them. Paint transparency with a brush or bucket, and export images as PNG, JPEG or multi-size ICO. Build scenes with eight 3D shapes, paint their surfaces, and export scene images or OBJ geometry.
+Choose from twelve 2D shapes, brushes and a canvas color sampler. Select pixels to move, resize or rotate them. Paint transparency with a brush or bucket, and export images as PNG, JPEG or multi-size ICO. Build scenes with eight 3D shapes, paint their surfaces, and export scene images or OBJ geometry.
 
 Save editable work as **.ada3dproject**. Recent projects appear in Welcome.
 
-| Selection tools | Settings |
+| 2D shapes | Settings |
 |---|---|
-| ![Eight-handle selection](docs/images/selection.png) | ![Settings](docs/images/settings.png) |
+| ![2D shape palette](docs/images/shapes.png) | ![Settings](docs/images/settings.png) |
 
 [3D shapes and painting](docs/3d-editing.md) · [User guide](docs/user-guide.md) · [Exporting](docs/exporting.md) · [Building and packaging](docs/platforms.md)
 

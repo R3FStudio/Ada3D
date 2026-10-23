@@ -2,6 +2,11 @@
 use super::*;
 
 impl Studio {
+    pub fn open_initial_project(&mut self, path: PathBuf, ctx: &egui::Context) {
+        self.show_welcome = false;
+        self.begin_load(path, ctx);
+    }
+
     pub(super) fn cancel_file_tasks(&self) {
         if let Some((_, job)) = &self.loading {
             job.cancel();

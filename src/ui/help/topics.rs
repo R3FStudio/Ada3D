@@ -4,7 +4,7 @@ pub(super) struct Topic {
     pub steps: &'static [&'static str],
     pub points: &'static [[f32; 2]],
 }
-pub(super) const NAMES: [&str; 8] = [
+pub(super) const NAMES: [&str; 9] = [
     "Drawing",
     "Transparency",
     "Selection",
@@ -12,9 +12,10 @@ pub(super) const NAMES: [&str; 8] = [
     "3D painting",
     "Save and export",
     "Settings",
+    "2D shapes",
     "Shortcuts",
 ];
-pub(super) const TOPICS: [Topic; 7] = [
+pub(super) const TOPICS: [Topic; 8] = [
     Topic {
         title: "Draw and choose colors",
         image: 0,
@@ -84,5 +85,15 @@ pub(super) const TOPICS: [Topic; 7] = [
             "About includes the version, R3F Studio, license and software updates. Check for updates here or when the app starts.",
         ],
         points: &[[0.10, 0.247], [0.10, 0.32], [0.10, 0.388]],
+    },
+    Topic {
+        title: "Create with 2D shapes",
+        image: 7,
+        steps: &[
+            "Open 2D shapes to see twelve labeled shape thumbnails. Brushes keeps the drawing tools separate.",
+            "Choose a thumbnail, then drag across the canvas to set its size. Or drag the thumbnail onto the canvas to place a shape.",
+            "Choose a color, stroke radius and Filled shape before drawing. Undo removes a placement; Select lets you move, resize or rotate its pixels.",
+        ],
+        points: &[[0.19, 0.07], [0.88, 0.39], [0.88, 0.62]],
     },
 ];
