@@ -1,0 +1,54 @@
+[package]
+name = "ada3d"
+version = "1.0.0"
+edition = "2024"
+rust-version = "1.88"
+description = "2D painting and 3D scene editing by R3F Studio"
+license = "GPL-3.0-only"
+authors = ["R3F Studio"]
+repository = "https://github.com/R3FStudio/Ada3D"
+
+[lib]
+name = "adars"
+
+[[bin]]
+name = "Ada3D"
+path = "src/main.rs"
+
+[dependencies]
+ureq = { version = "=2.12.1", default-features = false, features = ["tls"] }
+sha2 = "=0.10.9"
+semver = "=1.0.27"
+zip = { version = "=6.0.0", default-features = false, features = ["deflate"] }
+eframe = { version = "=0.32.3", default-features = false, features = ["default_fonts", "glow", "x11", "wayland"] }
+image = { version = "=0.25.8", default-features = false, features = ["png", "jpeg", "ico"] }
+rfd = "=0.15.4"
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+
+[target.'cfg(any(target_os = "windows", target_os = "macos"))'.dependencies]
+window-vibrancy = "=0.8.1"
+
+[target.'cfg(any(target_os = "windows", target_os = "macos", target_os = "linux"))'.dependencies]
+raw-window-handle = "=0.6.2"
+
+[target.'cfg(target_os = "macos")'.dependencies]
+objc2-app-kit = { version = "=0.3.2", default-features = false, features = ["std", "NSAppearance", "NSView", "NSWindow"] }
+
+[target.'cfg(target_os = "windows")'.dependencies]
+windows-sys = { version = "=0.61.2", features = ["Win32_Foundation", "Win32_Graphics_Dwm", "Win32_Graphics_Gdi", "Win32_UI_Controls", "Win32_UI_HiDpi", "Win32_UI_Shell", "Win32_UI_WindowsAndMessaging"] }
+
+[target.'cfg(target_os = "linux")'.dependencies]
+x11rb = "=0.13.2"
+wayland-client = { version = "=0.31.15", features = ["system", "dlopen"] }
+wayland-protocols = { version = "=0.32.13", features = ["client", "staging"] }
+wayland-protocols-plasma = { version = "=0.3.12", features = ["client"] }
+# Native fallback decorations for compositors without server-side frames.
+winit = { version = "=0.30.13", default-features = false, features = ["wayland-csd-adwaita", "wayland-dlopen"] }
+
+[profile.release]
+lto = "thin"
+codegen-units = 1
+
+[lints.rust]
+unsafe_code = "deny"

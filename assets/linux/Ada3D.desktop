@@ -1,0 +1,9 @@
+[Desktop Entry]
+Type=Application
+Name=Ada3D
+Comment=Draw and edit 3D scenes
+Exec=Ada3D %f
+Icon=Ada3D
+Terminal=false
+Categories=Graphics;2DGraphics;3DGraphics;
+StartupNotify=true

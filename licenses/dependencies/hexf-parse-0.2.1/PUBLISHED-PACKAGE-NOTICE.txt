@@ -1,0 +1,18 @@
+Published-package metadata notice for hexf-parse 0.2.1
+
+The following fields are preserved verbatim from parse/Cargo.toml at the
+published package's .cargo_vcs_info.json revision:
+
+name = "hexf-parse"
+version = "0.2.1"
+authors = ["Kang Seonghoon <public+rust@mearie.org>"]
+repository = "https://github.com/lifthrasiir/hexf"
+license = "CC0-1.0"
+
+Repository revision: 4225763d744183d720f575ae96d04161b4d08ea0
+Source: https://github.com/lifthrasiir/hexf/blob/4225763d744183d720f575ae96d04161b4d08ea0/parse/Cargo.toml
+
+No separate LICENSE file was present at that upstream revision or in the
+published hexf-parse 0.2.1 package. CC0-1.0-canonical.txt is the official
+Creative Commons legal text for the declared license, obtained separately;
+it is not represented as a file supplied by the hexf-parse author.

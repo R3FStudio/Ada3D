@@ -1,0 +1,22 @@
+name: Bug report
+description: Report a reproducible Ada3D issue.
+body:
+  - type: input
+    id: version
+    attributes:
+      label: Ada3D version
+    validations:
+      required: true
+  - type: input
+    id: os
+    attributes:
+      label: OS and desktop environment
+    validations:
+      required: true
+  - type: textarea
+    id: reproduction
+    attributes:
+      label: Steps to reproduce
+      description: Include what you expected and what happened. Attach a screenshot or sample project if useful.
+    validations:
+      required: true
