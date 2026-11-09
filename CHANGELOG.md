@@ -1,5 +1,9 @@
 # Changelog
 
+## v1.0.1
+
+- Fixed a crash after the loading screen on Linux.
+
 ## Initial release
 
 - Ada3D branding and publisher information for R3F Studio.

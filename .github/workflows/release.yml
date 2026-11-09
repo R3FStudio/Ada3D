@@ -40,7 +40,7 @@ jobs:
           python-version: '3.12'
       - name: Linux dependencies
         if: runner.os == 'Linux'
-        run: sudo apt-get update && sudo apt-get install -y build-essential pkg-config libx11-dev libxi-dev libxcursor-dev libxrandr-dev libxkbcommon-dev libwayland-dev libgl1-mesa-dev dpkg-dev rpm
+        run: sudo apt-get update && sudo apt-get install -y build-essential pkg-config libx11-dev libxi-dev libxcursor-dev libxrandr-dev libxkbcommon-dev libwayland-dev libgl1-mesa-dev dpkg-dev rpm weston libgl1-mesa-dri
       - name: Windows installer compiler
         if: runner.os == 'Windows'
         shell: pwsh
@@ -67,6 +67,9 @@ jobs:
       - run: cargo test --all-targets --locked
       - run: python -m unittest discover -s tests -p "test_*.py"
       - run: cargo build --release --locked
+      - name: Check Linux startup on Wayland
+        if: runner.os == 'Linux'
+        run: python tools/check-linux-startup.py build/release/Ada3D
       - run: python tools/collect-licenses.py
       - run: python tools/package.py
       - name: Build native installers
@@ -100,6 +103,7 @@ jobs:
     permissions:
       contents: write
     steps:
+      - uses: actions/checkout@v6
       - uses: actions/download-artifact@v8
         with:
           pattern: Ada3D-*
@@ -119,4 +123,4 @@ jobs:
             release/Ada3D-v*.rpm
             release/Ada3D-v*.rpm.sha256
           fail_on_unmatched_files: true
-          generate_release_notes: true
+          body_path: docs/releases/${{ github.ref_name }}.md

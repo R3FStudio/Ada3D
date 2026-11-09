@@ -85,6 +85,11 @@ impl Studio {
             self.workspace_started = Some(std::time::Instant::now());
             ctx.send_viewport_cmd(egui::ViewportCommand::Decorations(true));
             ctx.send_viewport_cmd(egui::ViewportCommand::Resizable(true));
+            // Winit's Wayland backend retains the fixed splash size as its
+            // maximum even after resizing is enabled. Clear it before growing
+            // the window or raising its minimum, which would violate xdg-shell
+            // size constraints and disconnect the app from the compositor.
+            ctx.send_viewport_cmd(egui::ViewportCommand::MaxInnerSize(Vec2::INFINITY));
             ctx.send_viewport_cmd(egui::ViewportCommand::EnableButtons {
                 close: true,
                 minimized: true,
